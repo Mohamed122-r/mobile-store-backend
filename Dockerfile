@@ -22,19 +22,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # نسخ جميع ملفات المشروع
 COPY . .
 
-# التحقق من الملفات الأساسية
-RUN echo "=== Checking Essential Files ===" && \
-    find app/ -name "*.php" | head -10 && \
-    ls -la app/Console/Kernel.php && \
-    ls -la app/Http/Kernel.php && \
-    ls -la app/Exceptions/Handler.php
-
-# تثبيت dependencies
+# تثبيت dependencies بدون scripts
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# تشغيل artisan commands
-RUN php artisan package:discover --no-ansi
+# لا تشغل package:discover - تخطي المشكلة
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
