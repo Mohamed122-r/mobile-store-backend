@@ -1,6 +1,7 @@
 FROM php:8.2-alpine
 
-WORKDIR /app
+# استخدام WORKDIR الذي يستخدمه Railway
+WORKDIR /workspace
 
 # تثبيت system dependencies
 RUN apk add --no-cache \
@@ -18,7 +19,8 @@ RUN docker-php-ext-install \
     pdo_pgsql \
     bcmath \
     zip \
-    mbstring
+    mbstring \
+    gd
 
 # تثبيت Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -27,9 +29,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # تثبيت dependencies بدون scripts
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-# تشغيل scripts يدوياً بعد التأكد من وجود الملفات
+# تشغيل artisan commands بعد التأكد من WORKDIR
 RUN php artisan package:discover --no-ansi
 
 # إنشاء application key
