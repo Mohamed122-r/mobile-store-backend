@@ -1,7 +1,6 @@
 FROM php:8.2-alpine
 
-# استخدام WORKDIR الذي يستخدمه Railway
-WORKDIR /workspace
+WORKDIR /app
 
 # تثبيت system dependencies
 RUN apk add --no-cache \
@@ -9,7 +8,6 @@ RUN apk add --no-cache \
     unzip \
     curl \
     libzip-dev \
-    libpng-dev \
     oniguruma-dev \
     postgresql-dev
 
@@ -17,10 +15,8 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
-    bcmath \
     zip \
-    mbstring \
-    gd
+    mbstring
 
 # تثبيت Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,18 +24,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # نسخ جميع ملفات المشروع
 COPY . .
 
-# تثبيت dependencies بدون scripts
-RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+# التحقق من الملفات الأساسية
+RUN echo "=== Checking Laravel Files ===" && \
+    ls -la artisan && \
+    ls -la bootstrap/app.php && \
+    ls -la app/Console/Kernel.php && \
+    ls -la app/Models/User.php
 
-# تشغيل artisan commands بعد التأكد من WORKDIR
+# تثبيت dependencies
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# تشغيل artisan commands
 RUN php artisan package:discover --no-ansi
 
 # إنشاء application key
-RUN test -f .env || cp .env.example .env
 RUN php artisan key:generate --force
-
-# إعداد الصلاحيات
-RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
