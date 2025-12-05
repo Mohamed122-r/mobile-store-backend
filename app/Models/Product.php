@@ -15,11 +15,24 @@ class Product extends Model
         'price',
         'image',
         'stock',
-        'category_id'
+        'category_id',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'is_active' => 'boolean'
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_items')
+                    ->withPivot('quantity', 'price')
+                    ->withTimestamps();
     }
 }
