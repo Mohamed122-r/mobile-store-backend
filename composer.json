@@ -2,7 +2,7 @@
     "name": "mobile-store/backend",
     "type": "project",
     "description": "Mobile Accessories Store API",
-    "keywords": ["laravel", "framework"],
+    "keywords": ["laravel", "api", "ecommerce"],
     "license": "MIT",
     "require": {
         "php": "^8.1",
@@ -20,13 +20,6 @@
     },
     "scripts": {
         "post-autoload-dump": []
-    },
-    "extra": {
-        "laravel": {
-            "dont-discover": [
-                "*"
-            ]
-        }
     },
     "config": {
         "optimize-autoloader": true,
