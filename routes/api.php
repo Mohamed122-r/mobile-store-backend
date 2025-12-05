@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/health', function () {
     return response()->json([
@@ -31,6 +32,16 @@ Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::put('/cart/update/{id}', [CartController::class, 'updateCart']);
 Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart']);
 
+// Authentication
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
 // الطلبات
 Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
+
+// Routes المحمية
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
